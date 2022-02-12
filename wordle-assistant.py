@@ -86,6 +86,12 @@ def find_entropies(g_dict, best_flag=False):
     for guess in g_dict:
         print_str = ""
         entropy = 0
+        
+        if len(g_dict[guess]) == 1 and "XXXXX" in g_dict[guess]:
+            entropy_bin += [(guess, -1)]
+            print(f"\n{guess}, Entropy score: [{entropy}] {print_str} --> WORDLE!\n")
+            continue
+
         for template in g_dict[guess]:
             print_str += f"\n.... {template}:  {', '.join(g_dict[guess][template])}"
             entropy += np.log2(len(g_dict[guess][template]))
