@@ -79,22 +79,17 @@ def make_guess_dict(allowed_left, answers_left):
     return g_dict
 
 
-def find_entropies(g_dict, best_flag=False):
+def find_entropies(g_dict, answers_left, best_flag=False):
     """ Calculates the entropy of all possible guesses remaining, 
         only printing out the best guesses if passing best_flag=True """
     entropy_bin = []
     for guess in g_dict:
         print_str = ""
         entropy = 0
-        
-        if len(g_dict[guess]) == 1 and "XXXXX" in g_dict[guess]:
-            entropy_bin += [(guess, -1)]
-            print(f"\n{guess}, Entropy score: [{entropy}] {print_str} --> WORDLE!\n")
-            continue
 
         for template in g_dict[guess]:
             print_str += f"\n.... {template}:  {', '.join(g_dict[guess][template])}"
-            entropy += np.log2(len(g_dict[guess][template]))
+            entropy += len(g_dict[guess][template]) * np.log2(len(g_dict[guess][template]))
         print_str = f"\n{guess}, Entropy score: [{entropy}] {print_str}\n"
         entropy_bin += [(guess, entropy)]
         
@@ -106,6 +101,8 @@ def find_entropies(g_dict, best_flag=False):
 
     print("Best guess(es): ")
     for (guess, entropy_val) in best:
+        if entropy_val == 0 and guess not in answers_left:
+            continue 
         print(f"* {guess} [{entropy_val}]")
         for template in g_dict[guess]:
             print(f".... {template}:  {', '.join(g_dict[guess][template])}")
@@ -131,7 +128,7 @@ def main():
         best_flag = '-b' in answer
         if 'y' in answer:
             guess_dict = make_guess_dict(allowed_left, answers_left)
-            find_entropies(guess_dict, best_flag=best_flag)
+            find_entropies(guess_dict, answers_left, best_flag=best_flag)
     
     
 if __name__ == '__main__':
