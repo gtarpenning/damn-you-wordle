@@ -1,4 +1,5 @@
 import numpy as np
+import logging
 
 
 def load_word_lists():
@@ -7,19 +8,22 @@ def load_word_lists():
     with open("./wordle-allowed-guesses.txt", "r") as f:
         allowed = f.read().split('\n')
 
-    print(f"Loaded [{len(allowed)}] possible words to guess")
+    logging.info(f"Loaded [{len(allowed)}] possible words to guess")
 
     answers = []
     with open("./wordle-answers-alphabetical.txt", "r") as f:
             answers = f.read().split('\n')
 
-    print(f"Loaded [{len(answers)}] possible wordles")
+    logging.info(f"Loaded [{len(answers)}] possible wordles")
     return answers, allowed
 
 
 def check_cand(guess, template, candidate):
     """ True if guess and hit/miss template is compatible 
-        for a given possible answer candidate """
+        for a given possible answer candidate 
+
+        TODO: Squash Bug relating to duplicate letters!    
+    """
     for l1, l2, t in zip(guess, candidate, template):
         if l1 == l2 and t != 'X':
             return False
@@ -82,6 +86,7 @@ def make_guess_dict(allowed_left, answers_left):
 def find_entropies(g_dict, answers_left, best_flag=False):
     """ Calculates the entropy of all possible guesses remaining, 
         only printing out the best guesses if passing best_flag=True """
+    
     entropy_bin = []
     for guess in g_dict:
         print_str = ""
@@ -89,7 +94,7 @@ def find_entropies(g_dict, answers_left, best_flag=False):
 
         for template in g_dict[guess]:
             print_str += f"\n.... {template}:  {', '.join(g_dict[guess][template])}"
-            entropy += 1/len(g_dict[guess][template]) * np.log2(len(g_dict[guess][template]))
+            entropy += len(g_dict[guess][template]) * np.log2(len(g_dict[guess][template]))
         print_str = f"\n{guess}, Entropy score: [{entropy}] {print_str}\n"
         entropy_bin += [(guess, entropy)]
         
@@ -99,6 +104,7 @@ def find_entropies(g_dict, answers_left, best_flag=False):
     entropy_bin.sort(key=lambda x: x[1], reverse=True)
     best = [x for x in entropy_bin if x[1] == entropy_bin[-1][1]]
 
+    """ Printing for local environment """
     print("Best guess(es): ")
     for (guess, entropy_val) in best:
         if entropy_val == 0 and guess not in answers_left:
@@ -108,6 +114,7 @@ def find_entropies(g_dict, answers_left, best_flag=False):
             print(f".... {template}:  {', '.join(g_dict[guess][template])}")
         
 def main():
+    """ Command Line Interface for Local Interaction """
     answers, allowed = load_word_lists()
     answers_left = answers.copy()
     allowed_left = allowed.copy()
