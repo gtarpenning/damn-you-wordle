@@ -4,9 +4,25 @@ import logging
 
 from deploy.backend.wordle_assistant import *
 
+def local_load_word_lists():
+    """ Load in word lists for possible 5 letter words """
+    allowed = []
+    with open("./data/wordle-allowed-guesses.txt", "r") as f:
+        allowed = f.read().split('\n')
+
+    logging.info(f"Loaded [{len(allowed)}] possible words to guess")
+
+    answers = []
+    with open("./data/wordle-answers-alphabetical.txt", "r") as f:
+            answers = f.read().split('\n')
+
+    logging.info(f"Loaded [{len(answers)}] possible wordles")
+    return answers, allowed
+
+
 def main():
     """ Command Line Interface for Local Interaction """
-    answers, allowed = load_word_lists()
+    answers, allowed = local_load_word_lists()
     answers_left = answers.copy()
     allowed_left = allowed.copy()
     while True:
