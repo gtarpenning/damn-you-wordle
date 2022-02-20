@@ -5,13 +5,13 @@ import logging
 def load_word_lists():
     """ Load in word lists for possible 5 letter words """
     allowed = []
-    with open("./data/wordle-allowed-guesses.txt", "r") as f:
+    with open("../../data/wordle-allowed-guesses.txt", "r") as f:
         allowed = f.read().split('\n')
 
     logging.info(f"Loaded [{len(allowed)}] possible words to guess")
 
     answers = []
-    with open("./data/wordle-answers-alphabetical.txt", "r") as f:
+    with open("../../data/wordle-answers-alphabetical.txt", "r") as f:
             answers = f.read().split('\n')
 
     logging.info(f"Loaded [{len(answers)}] possible wordles")
@@ -83,7 +83,7 @@ def make_guess_dict(allowed_left, answers_left):
     return g_dict
 
 
-def find_entropies(g_dict, answers_left, best_flag=False):
+def find_entropies(g_dict, answers_left, best_flag=False, local=False):
     """ Calculates the entropy of all possible guesses remaining, 
         only printing out the best guesses if passing best_flag=True """
     
@@ -102,17 +102,24 @@ def find_entropies(g_dict, answers_left, best_flag=False):
             print(print_str)
 
     entropy_bin.sort(key=lambda x: x[1], reverse=True)
-    best = [x for x in entropy_bin if x[1] == entropy_bin[-1][1]]
+    best = []
+    for (guess, entropy_val) in entropy_bin: 
+        if entropy_val == 0 and guess not in answers_left:
+            continue
+        elif entropy_val == entropy_bin[-1][1]:
+            best += [(guess, entropy_val)]
 
     """ Printing for local environment """
-    print("Best guess(es): ")
-    for (guess, entropy_val) in best:
-        if entropy_val == 0 and guess not in answers_left:
-            continue 
-        print(f"* {guess} [{entropy_val}]")
-        for template in g_dict[guess]:
-            print(f".... {template}:  {', '.join(g_dict[guess][template])}")
-        
+    if local:
+        print("Best guess(es): ")
+        for (guess, entropy_val) in best:
+            print(f"* {guess} [{entropy_val}]")
+            for template in g_dict[guess]:
+                print(f".... {template}:  {', '.join(g_dict[guess][template])}")
+
+    return best
+
+
 def main():
     """ Command Line Interface for Local Interaction """
     answers, allowed = load_word_lists()

@@ -26,7 +26,7 @@ def main():
         best_flag = '-b' in answer
         if 'y' in answer:
             guess_dict = make_guess_dict(allowed_left, answers_left)
-            find_entropies(guess_dict, answers_left, best_flag=best_flag)
+            find_entropies(guess_dict, answers_left, best_flag=best_flag, local=True)
     
     
 if __name__ == '__main__':
