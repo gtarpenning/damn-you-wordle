@@ -8,11 +8,11 @@ RUN apt-get install \
     'libsm6'\
     'libxext6'  -y
 
-COPY requirements.txt .
+COPY ./deploy/backend/requirements.txt .
 RUN pip install -r requirements.txt
 
 COPY . .
 
 EXPOSE 8080
 
-CMD ["python", "main.py"]
+CMD ["python", "./deploy/backend/main.py"]

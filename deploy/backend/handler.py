@@ -5,6 +5,8 @@ from firebase_admin import firestore
 
 import logging
 
+from wordle_assistant import *
+
 
 def init_db_handler():
     """ Connect to the firebase db """
@@ -32,6 +34,7 @@ def wordle_request(w_request):
         accepts a WorldeRequest object and returns json, with an error
         message on error, otherwise with a prompt to continue worlding 
     """
+    
     return None
 
 

@@ -5,13 +5,13 @@ import logging
 def load_word_lists():
     """ Load in word lists for possible 5 letter words """
     allowed = []
-    with open("./wordle-allowed-guesses.txt", "r") as f:
+    with open("./data/wordle-allowed-guesses.txt", "r") as f:
         allowed = f.read().split('\n')
 
     logging.info(f"Loaded [{len(allowed)}] possible words to guess")
 
     answers = []
-    with open("./wordle-answers-alphabetical.txt", "r") as f:
+    with open("./data/wordle-answers-alphabetical.txt", "r") as f:
             answers = f.read().split('\n')
 
     logging.info(f"Loaded [{len(answers)}] possible wordles")
