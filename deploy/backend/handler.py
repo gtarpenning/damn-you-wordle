@@ -58,6 +58,11 @@ def store_wordlists_by_sessionID(answers_left, allowed_left, db, sessionID):
     logging.info(wordlists)
 
 
+def delete_wordlists_by_sessionID(db, sessionID):
+    """ Deletes the wordlist db entry for a given sessionID """
+    wordlists = db.collection(u'wordlists').document(sessionID).delete()
+
+
 def wordle_request(w_request):
     """ Main function for handling a request to the wordle request endpoint
         accepts a WorldeRequest object and returns json, with an error
@@ -88,14 +93,17 @@ def wordle_request(w_request):
     
 
 def main():
-    answers, allowed = load_word_lists()
+    """ Test main func for local dev """
     db = get_db_handler()
     
     # Admin method
     get_users(db)
-    sID = make_session_ID()
-    print(sID)
-    get_wordlists_for_session(db, sID)
+    sID = '8ba67a20-9226-11ec-8e1a-562530c2346c'
+
+    ans, allo, err = get_wordlists_for_session(db, sID)
+    print(err)
+
+    store_wordlists_by_sessionID(ans, allo, db, sID)
 
 
 if __name__ == "__main__":
