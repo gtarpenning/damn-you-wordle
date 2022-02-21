@@ -1,4 +1,9 @@
+frontend.json
+.frontend.json
+
+
 # Byte-compiled / optimized / DLL files
+
 __pycache__/
 *.py[cod]
 *$py.class
