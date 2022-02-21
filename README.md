@@ -18,3 +18,5 @@ Follow prompts and enjoy getting that 3 (most of the time)!
 ### Frontend Incoming
 
 Repo to be deployed and accessible in browser!
+
+In repo: https://github.com/morjon/damn-you-wordle.app
