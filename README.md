@@ -20,3 +20,13 @@ Follow prompts and enjoy getting that 3 (most of the time)!
 Repo to be deployed and accessible in browser!
 
 In repo: https://github.com/morjon/damn-you-wordle.app
+
+
+### TODO: 
+
+1. Squash bug related to duplicate letters
+2. Optimize entropy calculation
+3. Implement call-response continuation for second/third/fourth requests on stored word lists 
+	3.a  Consider storing word lists locally in browser, no DB? Send wordlists back to endpoint
+4. Finalize endpoint and deploy
+

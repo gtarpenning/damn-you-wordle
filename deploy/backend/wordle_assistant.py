@@ -1,3 +1,4 @@
+from collections import Counter
 import numpy as np
 import logging
 
@@ -49,12 +50,16 @@ def make_template(pred, gold):
             "X": hit
             "O": in word
             "-": not in word """
+    gold_counter = Counter(gold)
+
     template = ""
-    for l1, l2 in zip(pred, gold):
+    for i, (l1, l2) in enumerate(zip(pred, gold)):
+        print(i, (l1, l2), gold.count(l1), pred[i:].count(l1))
         if l1 == l2:
             template += "X"
-        elif l1 in gold:
+        elif l1 in gold_counter:  # Buggy template creation fix
             template += "O"
+            del gold_counter[l1]
         else:
             template += "-"
     return template

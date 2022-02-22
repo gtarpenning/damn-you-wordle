@@ -1,7 +1,8 @@
 frontend.json
 .frontend.json
+frontend.app/
 
-
+*.DS_Store
 # Byte-compiled / optimized / DLL files
 
 __pycache__/
