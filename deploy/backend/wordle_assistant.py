@@ -19,47 +19,54 @@ def load_word_lists():
     return answers, allowed
 
 
-def check_cand(guess, template, candidate):
-    """ True if guess and hit/miss template is compatible 
-        for a given possible answer candidate 
-
-        TODO: Squash Bug relating to duplicate letters!    
+def check_cand(guess, template, candidate, lookup=None):
+    """ 
+    True if guess and hit/miss template is compatible 
+    for a given possible answer candidate 
+    Significant performance gain when using the lookup table
     """
+    if lookup:
+        return candidate in lookup[guess][template]
+    
     for l1, l2, t in zip(guess, candidate, template):
-        if l1 == l2 and t != 'X':
-            return False
-        if l1 != l2 and t == 'X':
+        if l1 in candidate and t == '-':
             return False
         if l1 not in candidate and t == 'O':
             return False
-        if l1 in candidate and t == '-':
+        if l1 == l2 and t != 'X':
+            return False
+        if l1 != l2 and t == 'X':
             return False
     return True
 
 
 def narrow_down(guess, template, words_left):
-    """ Accepts a wordle guess, and the number of words left;
-        defaults to all possible words left (for 1st turn) 
-        and returns list of remaining possible words """
+    """ 
+    Accepts a wordle guess, and the number of words left;
+    returns list of remaining possible words 
+    """
     return [cand for cand in words_left if check_cand(guess, template, cand)]
 
 
-def make_template(pred, gold):
+def make_template(pred, gold, lookup=None):
     """ Helper func to create worlde-like template 
         input two words and get a "XO---" 
             "X": hit
             "O": in word
             "-": not in word """
+    if lookup:
+        return lookup[pred][gold]
+    
     gold_counter = Counter(gold)
 
     template = ""
-    for i, (l1, l2) in enumerate(zip(pred, gold)):
-        print(i, (l1, l2), gold.count(l1), pred[i:].count(l1))
+    for (l1, l2) in enumerate(zip(pred, gold)):
         if l1 == l2:
             template += "X"
-        elif l1 in gold_counter:  # Buggy template creation fix
+            gold_counter[l1] -= 1
+        elif l1 in gold_counter and gold_counter[l1] > 0:  # Buggy template creation fix
             template += "O"
-            del gold_counter[l1]
+            gold_counter[l1] -= 1
         else:
             template += "-"
     return template
@@ -135,6 +142,10 @@ def main():
         if "," not in raw_input:
             print("Misformatted input")
             continue
+
+        # Local dev input
+        # raw_input = 'crane, -O--X'
+        # answer = 'y -b'
 
         guess, template = raw_input.split(",")
         answers_left = narrow_down(guess.strip(), template.strip(), answers_left)

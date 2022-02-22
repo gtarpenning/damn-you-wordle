@@ -78,7 +78,7 @@ def wordle_request(w_request):
 
     guess = w_request.guess
     template = w_request.template
-
+    
     answers_left, allowed_left, err = get_wordlists_for_session(db, w_request.sessionID)
 
     if not db or (err and err == "No wordlist for sessionID"):
