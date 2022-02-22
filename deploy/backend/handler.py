@@ -9,8 +9,9 @@ from wordle_assistant import *
 
 
 # Globals to load on server spinup
-answers, allowed = load_word_lists()
-candidate_lookup, template_lookup = load_lookup_tables(answers, allowed)
+datadir = './data/' if 'data' in os.listdir() else '../../data/'
+answers, allowed = load_word_lists(datadir)
+candidate_lookup, template_lookup = load_lookup_tables(datadir, answers, allowed)
 
 
 def wordle_request(w_request):

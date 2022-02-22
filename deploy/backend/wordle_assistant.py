@@ -2,25 +2,26 @@ from collections import Counter, defaultdict
 import numpy as np
 import logging
 import json
+import os
 
 
-def load_word_lists():
+def load_word_lists(datadir='./data/'):
     """ Load in word lists for possible 5 letter words """
     allowed = []
-    with open("../../data/wordle-allowed-guesses.txt", "r") as f:
+    with open(f"{datadir}wordle-allowed-guesses.txt", "r") as f:
         allowed = f.read().split('\n')
 
     logging.info(f"Loaded [{len(allowed)}] possible words to guess")
 
     answers = []
-    with open("../../data/wordle-answers-alphabetical.txt", "r") as f:
+    with open(f"{datadir}wordle-answers-alphabetical.txt", "r") as f:
         answers = f.read().split('\n')
 
     logging.info(f"Loaded [{len(answers)}] possible wordles")
     return answers, allowed
 
 
-def make_candidate_lookup_table(answers, allowed, template_lookup):
+def make_candidate_lookup_table(datadir, answers, allowed, template_lookup):
     """ 
     Build JSON for candidate lookup table of shape: 
     table {
@@ -38,13 +39,13 @@ def make_candidate_lookup_table(answers, allowed, template_lookup):
         for (word, template) in template_lookup[candidate].items():
             candidate_lookup[candidate][template] += [word]
     
-    with open('../../data/candidate_lookup.json', 'w') as f:
+    with open(f'{datadir}candidate_lookup.json', 'w') as f:
         json.dump(candidate_lookup, f)
 
     return candidate_lookup
 
 
-def make_template_lookup_table(answers, allowed):
+def make_template_lookup_table(datadir, answers, allowed):
     """ 
     Build template lookup table of shape: 
     table {
@@ -61,32 +62,28 @@ def make_template_lookup_table(answers, allowed):
         for word2 in answers:
             template_lookup[word1][word2] = make_template(word1, word2)
 
-    with open('../../data/template_lookup.json', 'w') as f:
+    with open(f'{datadir}template_lookup.json', 'w') as f:
         json.dump(template_lookup, f)
 
     return template_lookup
 
 
-def load_lookup_tables(answers, allowed):
+def load_lookup_tables(datadir, answers, allowed):
     """ Load pre-computed lookup tables """
-    import os
-
-    logging.info(os.listdir())
-
     t_lookup, cand_lookup = None, None
 
-    if 'template_lookup.json' not in os.listdir('../../data'):
-        t_lookup = make_template_lookup_table(answers, allowed)
+    if 'template_lookup.json' not in os.listdir(datadir):
+        t_lookup = make_template_lookup_table(datadir, answers, allowed)
 
-    if 'candidate_lookup.json' not in os.listdir('../../data'):
-        cand_lookup = make_candidate_lookup_table(answers, allowed, t_lookup)
+    if 'candidate_lookup.json' not in os.listdir(datadir):
+        cand_lookup = make_candidate_lookup_table(datadir, answers, allowed, t_lookup)
 
     if not cand_lookup:
-        with open("../../data/candidate_lookup.json", "r") as f:
+        with open(f"{datadir}candidate_lookup.json", "r") as f:
             cand_lookup = json.load(f)
 
     if not t_lookup:
-        with open("../../data/template_lookup.json", "r") as f:
+        with open(f"{datadir}template_lookup.json", "r") as f:
             t_lookup = json.load(f)
     
     return cand_lookup, t_lookup
