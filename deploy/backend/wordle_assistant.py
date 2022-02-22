@@ -1,6 +1,7 @@
 from collections import Counter
 import numpy as np
 import logging
+import json
 
 
 def load_word_lists():
@@ -19,14 +20,28 @@ def load_word_lists():
     return answers, allowed
 
 
-def check_cand(guess, template, candidate, lookup=None):
+def load_lookup_tables():
+    """ Load pre-computed lookup tables """
+    candidate_lookup = None
+    with open("../../data/candidate_lookup.json", "r") as f:
+        candidate_lookup = json.load(f)
+
+    template_lookup = None
+    with open("../../data/template_lookup.json", "r") as f:
+        template_lookup = json.load(f)
+    
+    return candidate_lookup, template_lookup
+
+
+def check_cand(guess, template, candidate, cand_lookup=None):
     """ 
     True if guess and hit/miss template is compatible 
     for a given possible answer candidate 
     Significant performance gain when using the lookup table
     """
-    if lookup:
-        return candidate in lookup[guess][template]
+    if cand_lookup and candidate in cand_lookup[guess]:
+        # Speedup only works for some cached values
+        return candidate in cand_lookup[guess][template]
     
     for l1, l2, t in zip(guess, candidate, template):
         if l1 in candidate and t == '-':
@@ -40,22 +55,22 @@ def check_cand(guess, template, candidate, lookup=None):
     return True
 
 
-def narrow_down(guess, template, words_left):
+def narrow_down(guess, template, words_left, c_lookup=None):
     """ 
     Accepts a wordle guess, and the number of words left;
     returns list of remaining possible words 
     """
-    return [cand for cand in words_left if check_cand(guess, template, cand)]
+    return [c for c in words_left if check_cand(guess, template, c, c_lookup)]
 
 
-def make_template(pred, gold, lookup=None):
+def make_template(pred, gold, t_lookup=None):
     """ Helper func to create worlde-like template 
         input two words and get a "XO---" 
             "X": hit
             "O": in word
             "-": not in word """
-    if lookup:
-        return lookup[pred][gold]
+    if t_lookup:
+        return t_lookup[pred][gold]
     
     gold_counter = Counter(gold)
 
@@ -72,7 +87,7 @@ def make_template(pred, gold, lookup=None):
     return template
 
 
-def make_guess_dict(allowed_left, answers_left):
+def make_guess_dict(allowed_left, answers_left, c_lookup=None, t_lookup=None):
     """ Return a dictionary of shape:
         guess word {
             possible_template_1 {
@@ -89,33 +104,36 @@ def make_guess_dict(allowed_left, answers_left):
     for guess in all_left: # a possible word that is allowed
         g_dict[guess] = {}
         for answer in answers_left:  # a potential answer
-            template = make_template(guess, answer)
+            template = make_template(guess, answer, t_lookup)
             g_dict[guess][template] = narrow_down(guess, template, answers_left)
     
     return g_dict
 
 
-def find_entropies(g_dict, answers_left, best_flag=False, local=False):
-    """ Calculates the entropy of all possible guesses remaining, 
-        only printing out the best guesses if passing best_flag=True """
-    
-    entropy_bin = []
-    for guess in g_dict:
-        print_str = ""
-        entropy = 0
+def calc_entropy(words):
+    """ 
+    Helper function to calculate some metric of uncertainty 
+    proportional to the probability of getting a template and
+    the number of guesses in the future required to resolve 
+    words resulting from said template
+    """
+    return len(words) * np.log2(len(words))
 
-        for template in g_dict[guess]:
-            print_str += f"\n.... {template}:  {', '.join(g_dict[guess][template])}"
-            entropy += len(g_dict[guess][template]) * np.log2(len(g_dict[guess][template]))
-        print_str = f"\n{guess}, Entropy score: [{entropy}] {print_str}\n"
+
+def find_entropies(answers_left, allowed_left, c_lookup, best_flag=False, local=False):
+    """ 
+    Calculates the entropy of all possible guesses remaining, 
+    only printing out the best guesses if passing best_flag=True
+    """
+    entropy_bin = []
+    for guess in answers_left + allowed_left:
+        entropy = sum([calc_entropy(c_lookup[guess][t]) for t in c_lookup[guess]])
         entropy_bin += [(guess, entropy)]
-        
-        if local and not best_flag:
-            print(print_str)
 
     entropy_bin.sort(key=lambda x: x[1], reverse=True)
     best = []
     for (guess, entropy_val) in entropy_bin: 
+        # Special case when possible last word, only guess real answers
         if entropy_val == 0 and guess not in answers_left:
             continue
         elif entropy_val == entropy_bin[-1][1]:
@@ -126,8 +144,8 @@ def find_entropies(g_dict, answers_left, best_flag=False, local=False):
         print("Best guess(es): ")
         for (guess, entropy_val) in best:
             print(f"* {guess} [{entropy_val}]")
-            for template in g_dict[guess]:
-                print(f".... {template}:  {', '.join(g_dict[guess][template])}")
+            for template in c_lookup[guess]:
+                print(f".... {template}:  {', '.join(c_lookup[guess][template])}")
 
     return best
 

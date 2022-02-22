@@ -37,8 +37,8 @@ def read_root():
 
 @app.post("/getword/")
 async def advance_wordle_word(req: WordleRequest):  # WordleRequest
-    logging.info(f"Recieved wordle request: [{req.id}: ({req.guess}, {req.template})]")
-    print(f"Recieved wordle request: [{req.id}: ({req.guess}, {req.template})]")
+    logging.info(f"Recieved wordle request: ({req.guess}, {req.template})")
+    print(f"Recieved wordle request: ({req.guess}, {req.template})")
     return handler.wordle_request(req)
 
 

@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 
 class WordleRequest(BaseModel):
-    id: str
-    sessionID: str
     template: str
     guess: str
+    answers_left: list
+    allowed_left: list
