@@ -40,6 +40,10 @@ def get_wordlists_for_session(db, sessionID):
     If username has an active session with existing word lists, 
     those are returned, otherwise the default word lists returned
     """
+    if not db:
+        answers, allowed = load_word_lists()
+        return answers, allowed, "No db"
+
     wordlists = db.collection(u'wordlists').document(sessionID).get()
     if not wordlists.exists:
         answers, allowed = load_word_lists()
@@ -68,29 +72,64 @@ def wordle_request(w_request):
         accepts a WorldeRequest object and returns json, with an error
         message on error, otherwise with a prompt to continue wordling 
     """
-    db = get_db_handler()
+    # db = get_db_handler() 
+    db = None  # local
+    sessionID = None
 
     guess = w_request.guess
     template = w_request.template
 
     answers_left, allowed_left, err = get_wordlists_for_session(db, w_request.sessionID)
 
-    if err and err == "No wordlist for sessionID":
+    if not db or (err and err == "No wordlist for sessionID"):
         sessionID = make_session_ID()
+    else:
+        print(f"Found sessionID: {sessionID}")
     
     answers_left = narrow_down(guess, template, answers_left)
     allowed_left = narrow_down(guess, template, allowed_left)
 
-    store_wordlists_by_sessionID(answers_left, allowed_left, db, sessionID)
+    if db:
+        store_wordlists_by_sessionID(answers_left, allowed_left, db, sessionID)
     
     guess_dict = make_guess_dict(allowed_left, answers_left)
     best_guesses = find_entropies(guess_dict, answers_left)
 
-    return {
+    out = {
         "best_guesses": best_guesses,
         "sessionID": sessionID,
     }
+
+    print(f"Returning to endpoing: {out}")
+
+    return out
+
+
+def cloud_endpoint_request():
+    """
+    make_authorized_get_request makes a GET request to the specified HTTP endpoint
+    in service_url (must be a complete URL) by authenticating with the
+    ID token obtained from the google-auth client library.
+    """
+    # local dev imports
+    import urllib
+
+    import google.auth.transport.requests
+    import google.oauth2.id_token
     
+    # hardcoded, only one endpoint to test
+    service_url = 'https://damn-you-wordle-uykoh7fkza-uw.a.run.app/'
+
+    req = urllib.request.Request(service_url)
+
+    auth_req = google.auth.transport.requests.Request()
+    id_token = google.oauth2.id_token.fetch_id_token(auth_req, service_url)
+
+    req.add_header("Authorization", f"Bearer {id_token}")
+    response = urllib.request.urlopen(req)
+
+    return response.read()
+
 
 def main():
     """ Test main func for local dev """
@@ -104,6 +143,10 @@ def main():
     print(err)
 
     store_wordlists_by_sessionID(ans, allo, db, sID)
+    
+    # Hit Cloud Enpoint
+    res = cloud_endpoint_request()
+    print(res)
 
 
 if __name__ == "__main__":

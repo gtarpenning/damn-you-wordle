@@ -98,7 +98,7 @@ def find_entropies(g_dict, answers_left, best_flag=False, local=False):
         print_str = f"\n{guess}, Entropy score: [{entropy}] {print_str}\n"
         entropy_bin += [(guess, entropy)]
         
-        if not best_flag:
+        if local and not best_flag:
             print(print_str)
 
     entropy_bin.sort(key=lambda x: x[1], reverse=True)

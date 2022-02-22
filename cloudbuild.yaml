@@ -16,6 +16,7 @@
    - 'gcr.io/$PROJECT_ID/damn-you-wordle:$COMMIT_SHA'
    - '--region'
    - 'us-west1'
+#  - '--allow-unauthenticated'
  images:
  - 'gcr.io/$PROJECT_ID/damn-you-wordle:$COMMIT_SHA'
  options:

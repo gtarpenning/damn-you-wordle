@@ -1,17 +1,32 @@
 import uuid
+import numpy as np
+import logging
+import json
 
 import uvicorn
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-
-import numpy as np
-import logging
 
 from models import WordleRequest
 import handler
 
 
 app = FastAPI()
+
+origins = [
+    "http://localhost",
+    "http://localhost:3000",  # Frontend Dev
+    "http://localhost:8080",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/")
@@ -21,9 +36,10 @@ def read_root():
 
 
 @app.post("/getword/")
-async def advance_wordle_word(req: WordleRequest):
+async def advance_wordle_word(req: WordleRequest):  # WordleRequest
     logging.info(f"Recieved wordle request: [{req.id}: ({req.guess}, {req.template})]")
-    return handler.wordle_request(req) or "Endpoint in progress"
+    print(f"Recieved wordle request: [{req.id}: ({req.guess}, {req.template})]")
+    return handler.wordle_request(req)
 
 
 if __name__ == "__main__":
