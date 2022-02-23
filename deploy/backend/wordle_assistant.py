@@ -121,11 +121,13 @@ def narrow_down(guess, template, words_left, c_lookup=None):
 
 
 def make_template(pred, gold, t_lookup=None):
-    """ Helper func to create worlde-like template 
-        input two words and get a "XO---" 
-            "X": hit
-            "O": in word
-            "-": not in word """
+    """ 
+    Helper func to create worlde-like template 
+    input two words and get a "XO---" 
+        "X": hit
+        "O": in word
+        "-": not in word 
+    """
     if t_lookup:
         return t_lookup[pred][gold]
     
@@ -145,16 +147,17 @@ def make_template(pred, gold, t_lookup=None):
 
 
 def make_candidate_lookup(allowed_left, answers_left):
-    """ Return a dictionary of shape:
-        guess word {
-            possible_template_1 {
-                [word1_given_template1, word2_given_template1, ...]
-            }
-            possible_template_2 {}
-                    .
-                    .
+    """ 
+    Return a dictionary of shape:
+    guess word {
+        possible_template_1 {
+            [word1_given_template1, word2_given_template1, ...]
         }
-            """
+        possible_template_2 {}
+                .
+                .
+    }
+    """
     g_dict = {}
     all_left = allowed_left + answers_left
     all_left.sort()  # Looks neater
