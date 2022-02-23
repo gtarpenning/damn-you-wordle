@@ -15,11 +15,9 @@ Repo for experimentation on a wordle-assistance bot. Purely to beat up on my fri
 
 Follow prompts and enjoy getting that 3 (most of the time)!
 
-### Frontend Incoming
+### Frontend
 
-Repo to be deployed and accessible in browser!
-
-In repo: https://github.com/morjon/damn-you-wordle.app
+Check out demo at: https://damn-you-wordle-app-gtarpenning.vercel.app/
 
 
 ### TODO: 
