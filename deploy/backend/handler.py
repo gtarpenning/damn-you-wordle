@@ -24,14 +24,19 @@ def wordle_request(w_request):
     answers_left = w_request.answers_left
     allowed_left = w_request.allowed_left
 
+    print(guess, template, answers_left, allowed_left)
+
     if guess not in answers + allowed:
         return {
             "best_guess": "Word Not Found",
         }
 
-    if not answers_left or allowed_left:
+    if not answers_left or not allowed_left:
         answers_left = candidate_lookup[guess][template]
-        allowed_left = narrow_down(guess, template, allowed.copy(), template_lookup)
+        allowed_left = narrow_down(guess, template, allowed.copy(), candidate_lookup)
+    else:
+        answers_left = narrow_down(guess, template, answers_left, candidate_lookup)
+        allowed_left = narrow_down(guess, template, allowed_left, candidate_lookup)
     
     best_guesses = find_entropies(answers_left, allowed_left, candidate_lookup)
 

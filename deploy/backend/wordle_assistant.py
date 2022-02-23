@@ -97,6 +97,7 @@ def check_cand(guess, template, candidate, cand_lookup=None):
     """
     if cand_lookup and candidate in cand_lookup[guess]:
         # Speedup only works for some cached values
+        print(guess, candidate, template, cand_lookup[guess])
         return candidate in cand_lookup[guess][template]
     
     for l1, l2, t in zip(guess, candidate, template):
@@ -131,7 +132,7 @@ def make_template(pred, gold, t_lookup=None):
     gold_counter = Counter(gold)
 
     template = ""
-    for (l1, l2) in enumerate(zip(pred, gold)):
+    for l1, l2 in zip(pred, gold):
         if l1 == l2:
             template += "X"
             gold_counter[l1] -= 1
@@ -143,7 +144,7 @@ def make_template(pred, gold, t_lookup=None):
     return template
 
 
-def make_guess_dict(allowed_left, answers_left, c_lookup=None, t_lookup=None):
+def make_candidate_lookup(allowed_left, answers_left):
     """ Return a dictionary of shape:
         guess word {
             possible_template_1 {
@@ -160,7 +161,7 @@ def make_guess_dict(allowed_left, answers_left, c_lookup=None, t_lookup=None):
     for guess in all_left: # a possible word that is allowed
         g_dict[guess] = {}
         for answer in answers_left:  # a potential answer
-            template = make_template(guess, answer, t_lookup)
+            template = make_template(guess, answer)
             g_dict[guess][template] = narrow_down(guess, template, answers_left)
     
     return g_dict
@@ -231,7 +232,7 @@ def main():
     
         best_flag = '-b' in answer
         if 'y' in answer:
-            guess_dict = make_guess_dict(allowed_left, answers_left)
+            guess_dict = make_candidate_lookup(allowed_left, answers_left)
             find_entropies(guess_dict, answers_left, best_flag=best_flag)
     
     
