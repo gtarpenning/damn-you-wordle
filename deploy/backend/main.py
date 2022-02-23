@@ -18,6 +18,7 @@ origins = [
     "http://localhost",
     "http://localhost:3000",  # Frontend Dev
     "http://localhost:8080",
+    "https://damn-you-wordle-app-mpc7znx0v-gtarpenning.vercel.app/", # Frontend Vercel
 ]
 
 app.add_middleware(
