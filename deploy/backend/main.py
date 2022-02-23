@@ -19,6 +19,10 @@ origins = [
     "http://localhost:3000",  # Frontend Dev
     "http://localhost:8080",
     "https://damn-you-wordle-app-mpc7znx0v-gtarpenning.vercel.app/", # Frontend Vercel
+<<<<<<< HEAD
+=======
+    "https://damn-you-wordle-app-gtarpenning.vercel.app/", # Another Frontend
+>>>>>>> 04eab6a969ac15de7b550800954b54c1bf7b032f
 ]
 
 app.add_middleware(
