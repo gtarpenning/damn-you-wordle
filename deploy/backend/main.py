@@ -18,8 +18,12 @@ origins = [
     "http://localhost",
     "http://localhost:3000",
     "http://localhost:8080",
-    "https://damn-you-wordle-app-mpc7znx0v-gtarpenning.vercel.app/",
+    "https://damn-you-wordle-app-mpc7znx0v-gtarpenning.vercel.app",
+    "http://damn-you-wordle-app-mpc7znx0v-gtarpenning.vercel.app",
+    "https://damn-you-wordle-app-gtarpenning.vercel.app",
+    "http://damn-you-wordle-app-gtarpenning.vercel.app",
     "https://damn-you-wordle-app-gtarpenning.vercel.app/",
+    "http://damn-you-wordle-app-gtarpenning.vercel.app/",
 ]
 
 app.add_middleware(
