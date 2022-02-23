@@ -17,7 +17,7 @@
    - '--region'
    - 'us-west1'
    - '--allow-unauthenticated'
-   - '--memory', '1024Mi'
+   - '--memory', '4Gi'
  images:
  - 'gcr.io/$PROJECT_ID/damn-you-wordle:$COMMIT_SHA'
  options:
